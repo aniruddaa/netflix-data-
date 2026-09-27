@@ -1,5 +1,6 @@
 from pathlib import Path
 from io import BytesIO, StringIO
+import base64
 
 import pandas as pd
 import streamlit as st
@@ -23,19 +24,33 @@ REQUIRED_COLUMNS = [
     "Watch_Count",
 ]
 
+background_path = Path(__file__).with_name("bg.png")
+background_data = (
+    base64.b64encode(background_path.read_bytes()).decode("ascii")
+    if background_path.exists()
+    else ""
+)
+
 st.markdown(
     """
     <style>
     :root {
-        --ink: #202124;
-        --muted: #6b7078;
+        --ink: #f7f5f6;
+        --muted: #d1c9cc;
         --accent: #e50914;
-        --rule: #e6e7e9;
-        --paper: #f7f7f5;
+        --rule: rgba(255, 255, 255, 0.18);
+        --paper: #0a070b;
     }
-    .stApp { background: var(--paper); color: var(--ink); }
-    [data-testid="stHeader"] { background: transparent; }
-    [data-testid="stSidebar"] { background: #efefed; }
+    .stApp {
+        color: var(--ink);
+        background-color: var(--paper);
+        background-image: linear-gradient(rgba(8, 5, 10, 0.54), rgba(8, 5, 10, 0.72)), url("data:image/png;base64,__BACKGROUND_DATA__");
+        background-position: center;
+        background-size: cover;
+        background-attachment: fixed;
+    }
+    [data-testid="stHeader"] { background: rgba(8, 5, 10, 0.2); }
+    [data-testid="stSidebar"] { background: rgba(8, 5, 10, 0.9); }
     .dashboard-kicker {
         color: var(--accent); font-size: 0.76rem; font-weight: 700;
         letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 0.25rem;
@@ -49,8 +64,13 @@ st.markdown(
         border-bottom: 1px solid var(--rule); color: var(--ink);
         font-size: 1.05rem; font-weight: 650; padding-bottom: 0.55rem;
     }
+    [data-testid="stAppViewContainer"] { background: transparent; }
+    [data-testid="stSidebar"] [data-testid="stWidgetLabel"],
+    [data-testid="stSidebar"] [data-testid="stMarkdownContainer"] { color: var(--ink); }
+    [data-testid="stFileUploader"] section { background: rgba(255, 255, 255, 0.96); }
+    [data-testid="stFileUploader"] section * { color: #202124; }
     </style>
-    """,
+    """.replace("__BACKGROUND_DATA__", background_data),
     unsafe_allow_html=True,
 )
 
